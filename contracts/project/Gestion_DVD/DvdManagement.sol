@@ -64,9 +64,6 @@ contract DvdManagement {
 
     function deleteDvD(uint _id) public isOwner{
         delete DVDs[_id];
-        // for(uint i = _id; i <= nextDvd; i++){
-        //     DVDs[i] = DVDs[i+1];
-        // }
         nextDvd--;
     }
 
