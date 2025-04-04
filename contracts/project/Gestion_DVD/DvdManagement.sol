@@ -36,7 +36,7 @@ contract DvdManagement {
     uint nextDvd = 0;
 
     event addedDvd(uint id, string title, string autor, uint numEx);
-    event addedLoan(address client, uint dvd_id, uint durationLoan);
+    event addedLoan(address client, uint dvd_id, uint durationLoan, uint totalFees);
 
     modifier isOwner{
         require(msg.sender == owner, "You're not the owner");
@@ -94,18 +94,20 @@ contract DvdManagement {
         require(_durationLoan > 0 && _durationLoan <= 30, "Duree invalide (1-30 jours)");
         clientLoan[msg.sender].listDvd.push(DVDs[_id]);
         numLoan[msg.sender]++;
-        uint totalCost = clientLoan[msg.sender].feesRental * _durationLoan;
+        clientLoan[msg.sender].feesRental = 3000000000;
+        uint feesRental = clientLoan[msg.sender].feesRental;
+        uint totalFees = feesRental * _durationLoan;
 
-        // require(
-        //     tokenDePaiement.transferFrom(msg.sender, DVDs[_id].currentOwner, totalCost),
-        //     "Payment defaulter"
-        // );
+        require(
+            payable (msg.sender).balance >= totalFees,
+            "Amount not enough"
+        );
 
         DVDs[_id].statut = StatutDvd.borrowed;
         clientLoan[msg.sender].dateRental = block.timestamp;
         clientLoan[msg.sender].durationLoan = _durationLoan * 1 days;
 
-        emit addedLoan(msg.sender, _id, _durationLoan);
+        emit addedLoan(msg.sender, _id, _durationLoan, totalFees);
     }
 
     function deleteLoan(address _clientAddress, uint _id) public isOwner{
@@ -115,13 +117,13 @@ contract DvdManagement {
         DVDs[_id].numCopy++;
     }
 
-    function byeDvd() public {
+    function byeDvd(uint _id) public {
+        require(DVDs[_id].statut == StatutDvd.available, "DvD is not available");
+        require(payable(msg.sender).balance < DVDs[_id].price, "Amount not enough");
 
-    }
-
-    // Fonction pour retirer les Ethers du contrat (seulement propriétaire)
-    function retirerEthers() public isOwner {
-        payable(owner).transfer(address(this).balance);
-    }
-    
+        uint amount = DVDs[_id].price;
+        payable (owner).transfer(amount);
+        DVDs[_id].statut = StatutDvd.sold;
+        DVDs[_id].currentOwner = msg.sender;
+    }    
 }
