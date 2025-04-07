@@ -15,6 +15,31 @@
 				"inputs": [
 					{
 						"indexed": false,
+						"internalType": "address",
+						"name": "client",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "sms",
+						"type": "string"
+					}
+				],
+				"name": "DvdPurchased",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
 						"internalType": "uint256",
 						"name": "id",
 						"type": "uint256"
@@ -42,40 +67,10 @@
 				"type": "event"
 			},
 			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "client",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "dvd_id",
-						"type": "uint256"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "durationLoan",
-						"type": "uint256"
-					}
-				],
-				"name": "addedLoan",
-				"type": "event"
-			},
-			{
 				"inputs": [
 					{
 						"internalType": "string",
 						"name": "_title",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "_autor",
 						"type": "string"
 					},
 					{
@@ -100,23 +95,11 @@
 						"internalType": "uint256",
 						"name": "_id",
 						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "_durationLoan",
-						"type": "uint256"
 					}
 				],
-				"name": "addLoan",
+				"name": "buyDvd",
 				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "byeDvd",
-				"outputs": [],
-				"stateMutability": "nonpayable",
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
@@ -128,24 +111,6 @@
 					}
 				],
 				"name": "deleteDvD",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_clientAddress",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "_id",
-						"type": "uint256"
-					}
-				],
-				"name": "deleteLoan",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -164,11 +129,6 @@
 							{
 								"internalType": "string",
 								"name": "d_title",
-								"type": "string"
-							},
-							{
-								"internalType": "string",
-								"name": "autor",
 								"type": "string"
 							},
 							{
@@ -201,6 +161,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "getBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -220,11 +193,6 @@
 							{
 								"internalType": "string",
 								"name": "d_title",
-								"type": "string"
-							},
-							{
-								"internalType": "string",
-								"name": "autor",
 								"type": "string"
 							},
 							{
@@ -271,9 +239,47 @@
 			},
 			{
 				"inputs": [],
-				"name": "retirerEthers",
-				"outputs": [],
-				"stateMutability": "nonpayable",
+				"name": "seePurchase",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "d_id",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "d_title",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "numCopy",
+								"type": "uint256"
+							},
+							{
+								"internalType": "enum DvdManagement.StatutDvd",
+								"name": "statut",
+								"type": "uint8"
+							},
+							{
+								"internalType": "address",
+								"name": "currentOwner",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct DvdManagement.dvd[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -286,11 +292,6 @@
 					{
 						"internalType": "string",
 						"name": "_title",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "_autor",
 						"type": "string"
 					},
 					{
@@ -337,11 +338,11 @@
 	},
 	"sources": {
 		"contracts/project/Gestion_DVD/DvdManagement.sol": {
-			"keccak256": "0x34dfee7697657c0687c50355fdb6a98a45f2dc4cf0a2ad4959f38ef1297d83c2",
+			"keccak256": "0x0f098f4bac1ff998d949dd17f22b06af531bc18ddc9881e87f8495c1be5da70a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9d8c00f259f0d1cc0dac7588b94c4161037b0377a79d0c7343ab1009cfe38c80",
-				"dweb:/ipfs/QmQNGXF6T8CGf6bMr1c45frmFLdgRKRqQe97tZsXRJRp2j"
+				"bzz-raw://86d127ed29bafc1e80ea7d625c1b392fbc11e87ed01c38a840d8f7276c439db3",
+				"dweb:/ipfs/QmNnAUixjyqVMVHVJNvcigGxhbLCyY3hffLwRvFjDZBR1V"
 			]
 		}
 	},

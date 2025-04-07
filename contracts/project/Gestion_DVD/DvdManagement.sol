@@ -9,34 +9,23 @@ contract DvdManagement {
         owner = msg.sender;
     }
 
-    enum StatutDvd {available, borrowed, sold}
-
-    struct Loan{
-        uint e_id;
-        uint dateRental;
-        uint durationLoan;
-        uint feesRental;
-        dvd[] listDvd;
-    }
+    enum StatutDvd {available, sold}
 
     struct dvd{
         uint d_id;
         string d_title;
-        string autor;
         uint numCopy;
         StatutDvd statut;
         address currentOwner;
-        uint price;
+        uint256 price;
     }
 
     mapping (uint => dvd) DVDs;
-    mapping (address => uint) numLoan;
-    mapping (address => Loan) clientLoan;
 
-    uint nextDvd = 0;
+    uint nextDvd;
 
     event addedDvd(uint id, string title, string autor, uint numEx);
-    event addedLoan(address client, uint dvd_id, uint durationLoan, uint totalFees);
+    event DvdPurchased(address client, uint id, string sms);
 
     modifier isOwner{
         require(msg.sender == owner, "You're not the owner");
@@ -44,38 +33,36 @@ contract DvdManagement {
     }
 
     modifier dvdExist(uint _id){
-        require(_id > 0 && _id < nextDvd, "Invalid Id");
+        require(_id >= 0 && _id < nextDvd, "Invalid Id");
         _;
     }
 
     receive() external payable { }
 
-    function addDvD(string memory _title, string memory _autor, uint _numCopy, uint _price) public  isOwner{
+    function addDvD(string memory _title, uint _numCopy, uint _price) public  isOwner{
         DVDs[nextDvd] = dvd({d_id           : nextDvd, 
                              d_title        : _title, 
-                             autor          : _autor, 
-                             numCopy  : _numCopy, 
+                             numCopy        : _numCopy, 
                              statut         : StatutDvd.available,
                              currentOwner   : owner,
                              price          : _price});
         nextDvd++;
-        emit addedDvd(nextDvd - 1, _title, _autor, _numCopy);
     }
 
-    function deleteDvD(uint _id) public isOwner{
+    function deleteDvD(uint _id) public isOwner dvdExist(_id){
+        require(DVDs[_id].statut == StatutDvd.available, "Dvd is not available");
         delete DVDs[_id];
         nextDvd--;
     }
 
-    function updateDvD(uint _id, string memory _title, string memory _autor, uint _numCopy) public isOwner{
+    function updateDvD(uint _id, string memory _title, uint _numCopy) public isOwner{
         DVDs[_id].d_title =  _title;
-        DVDs[_id].autor = _autor;
         DVDs[_id].numCopy = _numCopy;
     }
 
     function getAllDvD() public isOwner view returns(dvd[] memory){
         require(nextDvd > 0, "No Dvd available");
-        dvd[] memory DvdList = new dvd[](nextDvd - 1);
+        dvd[] memory DvdList = new dvd[](nextDvd);
         for(uint i = 0; i < nextDvd; i++){
             DvdList[i] = DVDs[i];
         }
@@ -87,40 +74,47 @@ contract DvdManagement {
         return dvdL;
     }
 
-    function addLoan(uint _id, uint _durationLoan) public {
-        require(_durationLoan > 0 && _durationLoan <= 30, "Duree invalide (1-30 jours)");
-        clientLoan[msg.sender].listDvd.push(DVDs[_id]);
-        numLoan[msg.sender]++;
-        clientLoan[msg.sender].feesRental = 3000000000;
-        uint feesRental = clientLoan[msg.sender].feesRental;
-        uint totalFees = feesRental * _durationLoan;
-
-        require(
-            payable (msg.sender).balance >= totalFees,
-            "Amount not enough"
-        );
-
-        DVDs[_id].statut = StatutDvd.borrowed;
-        clientLoan[msg.sender].dateRental = block.timestamp;
-        clientLoan[msg.sender].durationLoan = _durationLoan * 1 days;
-
-        emit addedLoan(msg.sender, _id, _durationLoan, totalFees);
-    }
-
-    function deleteLoan(address _clientAddress, uint _id) public isOwner{
-        delete clientLoan[_clientAddress].listDvd[_id];
-        numLoan[_clientAddress]--;
-        DVDs[_id].statut = StatutDvd.available;
-        DVDs[_id].numCopy++;
-    }
-
-    function byeDvd(uint _id) public {
+    function buyDvd(uint _id) public payable dvdExist(_id){
         require(DVDs[_id].statut == StatutDvd.available, "DvD is not available");
-        require(payable(msg.sender).balance < DVDs[_id].price, "Amount not enough");
 
-        uint amount = DVDs[_id].price;
-        payable (owner).transfer(amount);
+        uint256 priceInWei = DVDs[_id].price * 1 ether;
+        require(msg.value >= priceInWei, "Insufficient ETH sent");
+        if (msg.value > priceInWei) {
+            payable(msg.sender).transfer(msg.value - DVDs[_id].price);
+        }
+
+        payable(owner).transfer(priceInWei);
         DVDs[_id].statut = StatutDvd.sold;
         DVDs[_id].currentOwner = msg.sender;
-    }    
+
+        emit DvdPurchased(msg.sender, _id, "DVD purchased successfully!");
+    }  
+
+    function seePurchase() public view returns(dvd[] memory) {
+        uint count = 0;
+        for(uint i = 0; i < nextDvd; i++) {
+            if (DVDs[i].statut == StatutDvd.sold && DVDs[i].currentOwner == msg.sender) {
+                count++;
+            }
+        }
+
+        require(count > 0, "No purchase found for this address");
+
+        dvd[] memory purchases = new dvd[](count);
+        uint index = 0;
+        
+        // Remplir le tableau
+        for(uint i = 0; i < nextDvd; i++) {
+            if (DVDs[i].statut == StatutDvd.sold && DVDs[i].currentOwner == msg.sender) {
+                purchases[index] = DVDs[i];
+                index++;
+            }
+        }
+
+        return purchases;
+    }
+
+    function getBalance() view public returns(uint){
+        return (msg.sender).balance;
+    }
 }
