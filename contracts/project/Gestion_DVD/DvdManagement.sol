@@ -37,9 +37,14 @@ contract DvdManagement {
         _;
     }
 
+    modifier unsignPrice(uint256 price){
+        require(price > 0, "le price must be > 0");
+        _;
+    }
+
     receive() external payable { }
 
-    function addDvD(string memory _title, uint _numCopy, uint _price) public  isOwner{
+    function addDvD(string memory _title, uint _numCopy, uint256 _price) public  isOwner unsignPrice(_price){
         DVDs[nextDvd] = dvd({d_id           : nextDvd, 
                              d_title        : _title, 
                              numCopy        : _numCopy, 
@@ -77,7 +82,7 @@ contract DvdManagement {
     function buyDvd(uint _id) public payable dvdExist(_id){
         require(DVDs[_id].statut == StatutDvd.available, "DvD is not available");
 
-        uint256 priceInWei = DVDs[_id].price * 1 ether;
+        uint256 priceInWei = DVDs[_id].price;
         require(msg.value >= priceInWei, "Insufficient ETH sent");
         if (msg.value > priceInWei) {
             payable(msg.sender).transfer(msg.value - DVDs[_id].price);
