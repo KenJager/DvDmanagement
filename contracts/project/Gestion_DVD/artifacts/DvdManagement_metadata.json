@@ -296,7 +296,7 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "_numCopy",
+						"name": "_price",
 						"type": "uint256"
 					}
 				],
@@ -338,11 +338,11 @@
 	},
 	"sources": {
 		"contracts/project/Gestion_DVD/DvdManagement.sol": {
-			"keccak256": "0xa24b60b54c5e1ea53c24f0004a4662a97944db622468a2514dc196ae4002c454",
+			"keccak256": "0x1144a358863652f2ca252e39c72a2706db092ea8d4e67a2b710a119cfb5ac56d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://2829bfa702b390cf75348ee8d24e341ac013af9650b3628ad2592afea6e82e1b",
-				"dweb:/ipfs/QmNpLCHDC9NQa3QTLxaWcJqQ3LRQR99mjZEQqxvSc6mufR"
+				"bzz-raw://690c32b6f41eb38cb66df563ed72f2dd2dfd5c61047c522d06627977dd8697b4",
+				"dweb:/ipfs/QmeR48Rojx25i1D1SMUr3XN4HmyhvuybtoqvJx2KMLXLin"
 			]
 		}
 	},

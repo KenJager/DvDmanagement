@@ -60,9 +60,13 @@ contract DvdManagement {
         nextDvd--;
     }
 
-    function updateDvD(uint _id, string memory _title, uint _numCopy) public isOwner{
-        DVDs[_id].d_title =  _title;
-        DVDs[_id].numCopy = _numCopy;
+    function updateDvD(uint _id, string memory _title, uint _price) public isOwner{
+        if (bytes(_title).length > 0) {
+            DVDs[_id].d_title = _title;
+        }
+        if(_price != 0){
+            DVDs[_id].price = _price;
+        }
     }
 
     function getAllDvD() public isOwner view returns(dvd[] memory){
